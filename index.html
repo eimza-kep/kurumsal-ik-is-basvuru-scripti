@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kariyer ve İş Başvuru Formu | Kurumsal İK Portalı</title>
+    <style>
+        :root {
+            --primary: #4338ca;
+            --primary-hover: #3730a3;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #15803d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--text-main); line-height: 1.55; padding: 32px 16px; min-height: 100vh; }
+        .container { max-width: 880px; margin: 0 auto; }
+
+        .header {
+            text-align: center; margin-bottom: 28px; background: white; padding: 30px 24px;
+            border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            position: relative; overflow: hidden;
+        }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--primary); }
+        .header-badge {
+            display: inline-block; background: #e0e7ff; color: var(--primary);
+            font-size: 0.78rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; margin-bottom: 10px;
+        }
+        .header h1 { font-size: 1.6rem; color: var(--secondary); margin-bottom: 8px; font-weight: 800; }
+        .header p { font-size: 0.9rem; color: var(--text-muted); max-width: 680px; margin: 0 auto; }
+
+        .card {
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+            padding: 26px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .card-title {
+            font-size: 1.05rem; font-weight: 700; color: var(--secondary); margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: span 2; }
+        label { font-size: 0.83rem; font-weight: 600; color: #334155; }
+        label span.req { color: #dc2626; margin-left: 2px; }
+
+        input, select, textarea {
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 0.88rem; outline: none; background: #f8fafc; color: var(--text-main);
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.1); }
+        textarea { min-height: 80px; resize: vertical; }
+
+        .dropzone {
+            border: 2px dashed #c7d2fe; border-radius: 10px; padding: 24px; text-align: center;
+            background: #eef2ff; cursor: pointer; transition: all 0.2s;
+        }
+        .dropzone:hover { background: #e0e7ff; }
+
+        .btn-submit {
+            width: 100%; background: var(--primary); color: white; border: none; padding: 14px;
+            border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-submit:hover { background: var(--primary-hover); }
+
+        .success-box {
+            display: none; background: white; border: 2px solid #a5b4fc; border-radius: 12px;
+            padding: 36px 24px; text-align: center; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+        }
+        .badge-code {
+            display: inline-block; background: #eef2ff; border: 2px dashed var(--primary); color: var(--primary);
+            font-size: 1.35rem; font-weight: 800; padding: 8px 24px; border-radius: 8px; margin: 16px 0;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-badge">KURUMSAL İK & KARİYER</div>
+        <h1>İş ve Staj Başvuru Formu</h1>
+        <p>Aramıza katılmak ve kariyerinizi şirketimizde şekillendirmek için lütfen aşağıdaki bilgileri eksiksiz doldurunuz.</p>
+    </div>
+
+    <form id="ikForm" onsubmit="submitIkForm(event)">
+        <!-- 1. Pozisyon ve Kişisel Bilgiler -->
+        <div class="card">
+            <h2 class="card-title">💼 1. Pozisyon ve Kimlik Bilgileri</h2>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Başvurulan Pozisyon / Departman <span class="req">*</span></label>
+                    <select id="position" required>
+                        <option value="">Seçiniz...</option>
+                        <option value="Yazılım Geliştirici (Fullstack / Backend)">Yazılım Geliştirici (Fullstack / Backend)</option>
+                        <option value="Muhasebe ve Finans Uzmanı">Muhasebe ve Finans Uzmanı</option>
+                        <option value="Kurumsal Satış & B2B Temsilcisi">Kurumsal Satış & B2B Temsilcisi</option>
+                        <option value="Müşteri Başarı & Teknik Destek">Müşteri Başarı & Teknik Destek</option>
+                        <option value="İnsan Kaynakları Uzmanı">İnsan Kaynakları Uzmanı</option>
+                        <option value="Genel Başvuru / Staj">Genel Başvuru / Stajyer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Adınız ve Soyadınız <span class="req">*</span></label>
+                    <input type="text" id="fullName" required placeholder="Adınız Soyadınız">
+                </div>
+                <div class="form-group">
+                    <label>T.C. Kimlik Numarası <span class="req">*</span></label>
+                    <input type="text" id="idNumber" required placeholder="11 haneli TCKN" maxlength="11">
+                </div>
+                <div class="form-group">
+                    <label>İletişim Telefonu <span class="req">*</span></label>
+                    <input type="tel" id="phone" required placeholder="05XX XXX XX XX">
+                </div>
+                <div class="form-group">
+                    <label>E-Posta Adresi <span class="req">*</span></label>
+                    <input type="email" id="email" required placeholder="ornek@domain.com">
+                </div>
+                <div class="form-group">
+                    <label>İkamet Ettiğiniz Şehir <span class="req">*</span></label>
+                    <input type="text" id="city" required placeholder="Örn: İstanbul">
+                </div>
+                <div class="form-group">
+                    <label>Askerlik Durumu (Erkek Adaylar İçin)</label>
+                    <select id="militaryStatus">
+                        <option value="Muaf / Yapıldı">Yapıldı / Muaf</option>
+                        <option value="Tecilli">Tecilli</option>
+                        <option value="Belirtilmedi">Uygulanamaz / Belirtilmedi</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Eğitim & Deneyim -->
+        <div class="card">
+            <h2 class="card-title">🎓 2. Eğitim, Deneyim ve Beklentiler</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>En Son Mezun Olunan Okul / Düzey <span class="req">*</span></label>
+                    <select id="educationLevel" required>
+                        <option value="Lisans">Lisans (Üniversite)</option>
+                        <option value="Yüksek Lisans / Doktora">Yüksek Lisans / Doktora</option>
+                        <option value="Ön Lisans">Ön Lisans (Meslek Yüksekokulu)</option>
+                        <option value="Lise">Lise</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Üniversite & Bölüm Adı <span class="req">*</span></label>
+                    <input type="text" id="schoolDepartment" required placeholder="Örn: İTÜ - Bilgisayar Mühendisliği">
+                </div>
+                <div class="form-group">
+                    <label>Toplam İş Deneyimi</label>
+                    <select id="experienceYears">
+                        <option value="Yeni Mezun / Deneyimsiz">Yeni Mezun / Deneyimsiz</option>
+                        <option value="1 - 3 Yıl">1 - 3 Yıl</option>
+                        <option value="3 - 5 Yıl">3 - 5 Yıl</option>
+                        <option value="5+ Yıl">5 Yıldan Fazla</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Beklenen Net Maaş Aralığı (TL)</label>
+                    <input type="text" id="salaryExpectation" placeholder="Örn: 45.000 TL">
+                </div>
+                <div class="form-group full">
+                    <label>LinkedIn Profil URL veya Portfolyo Linki</label>
+                    <input type="url" id="linkedinUrl" placeholder="https://linkedin.com/in/profiliniz">
+                </div>
+                <div class="form-group full">
+                    <label>Özgeçmiş / CV Dosyası Seçimi</label>
+                    <div class="dropzone" onclick="document.getElementById('cvFile').click()">
+                        <div style="font-size: 1.8rem; margin-bottom: 4px;">📄</div>
+                        <div style="font-weight: 700; color: var(--primary);">CV Dosyanızı Seçin (PDF veya Word)</div>
+                        <input type="file" id="cvFile" style="display: none;" onchange="handleCvSelect(this)">
+                        <div id="cvDisplay" style="margin-top: 6px; font-weight: 600; font-size: 0.82rem;"></div>
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <label>Kendinizi Tanıtıcı Kısa Ön Yazı</label>
+                    <textarea id="coverLetter" placeholder="Yetkinlikleriniz, kariyer hedefleriniz ve bu pozisyonu neden istediğinizi belirtiniz..."></textarea>
+                </div>
+            </div>
+
+            <div style="margin-top: 18px; display: flex; align-items: flex-start; gap: 8px;">
+                <input type="checkbox" id="kvkkCheck" required style="width: 18px; height: 18px; margin-top: 2px; cursor: pointer;">
+                <label for="kvkkCheck" style="font-size: 0.82rem; color: #475569; cursor: pointer;">
+                    6698 sayılı KVKK kapsamında <b>Çalışan Adayı Aydınlatma Metni</b>'ni okuduğumu, iş başvurumun değerlendirilmesi ve referans kontrolü amacıyla kişisel verilerimin işlenmesini kabul ediyorum.
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+            <span>🚀 İş Başvurusunu Gönder</span>
+        </button>
+    </form>
+
+    <!-- Success View -->
+    <div class="success-box" id="successBox">
+        <div style="font-size: 3rem; margin-bottom: 12px;">🎉</div>
+        <h2 style="font-size: 1.45rem; color: var(--secondary);">İş Başvurunuz Başarıyla Alındı!</h2>
+        <p style="color: var(--text-muted); font-size: 0.92rem; margin-top: 6px;">
+            Özgeçmişiniz İnsan Kaynakları departmanımızın değerlendirme havuzuna aktarılmıştır.
+        </p>
+
+        <div>
+            <span style="font-size: 0.85rem; color: #64748b;">Başvuru Takip Numaranız:</span><br>
+            <div class="badge-code" id="trackingCodeDisplay">BASVURU-2026-0000</div>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; max-width: 500px; margin: 16px auto; font-size: 0.88rem; text-align: left; line-height: 1.8;">
+            <div><b>Aday:</b> <span id="resName"></span></div>
+            <div><b>Pozisyon:</b> <span id="resPos"></span></div>
+            <div><b>Eğitim:</b> <span id="resEdu"></span></div>
+            <div><b>İletişim:</b> <span id="resPhone"></span> | <span id="resEmail"></span></div>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; justify-content: center; gap: 12px;">
+            <button class="btn-submit" style="width: auto; padding: 10px 20px;" onclick="window.print()">🖨️ Başvuru Formunu Yazdır</button>
+            <button class="btn-submit" style="width: auto; padding: 10px 20px; background: #e2e8f0; color: #334155;" onclick="location.reload()">➕ Yeni Başvuru</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let cvFileName = "";
+
+function handleCvSelect(input) {
+    if (input.files.length > 0) {
+        cvFileName = input.files[0].name;
+        document.getElementById('cvDisplay').innerText = `✅ Seçilen CV: ${cvFileName}`;
+    }
+}
+
+async function submitIkForm(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerText = '⏳ Gönderiliyor...';
+
+    const payload = {
+        position: document.getElementById('position').value,
+        full_name: document.getElementById('fullName').value.trim(),
+        id_number: document.getElementById('idNumber').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        city: document.getElementById('city').value.trim(),
+        military_status: document.getElementById('militaryStatus').value,
+        education_level: document.getElementById('educationLevel').value,
+        school_department: document.getElementById('schoolDepartment').value.trim(),
+        experience_years: document.getElementById('experienceYears').value,
+        salary_expectation: document.getElementById('salaryExpectation').value.trim(),
+        linkedin_url: document.getElementById('linkedinUrl').value.trim(),
+        cv_file_name: cvFileName,
+        cover_letter: document.getElementById('coverLetter').value.trim(),
+        created_at: new Date().toISOString()
+    };
+
+    let trackingCode = 'BASVURU-2026-' + Math.floor(1000 + Math.random() * 9000);
+
+    try {
+        const res = await fetch('/api/basvuru-yap', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.tracking_code) trackingCode = data.tracking_code;
+        }
+    } catch (err) {
+        const local = JSON.parse(localStorage.getItem('ik_basvurular') || '[]');
+        payload.tracking_code = trackingCode;
+        local.push(payload);
+        localStorage.setItem('ik_basvurular', JSON.stringify(local));
+    }
+
+    document.getElementById('ikForm').style.display = 'none';
+    document.getElementById('successBox').style.display = 'block';
+    document.getElementById('trackingCodeDisplay').innerText = trackingCode;
+    document.getElementById('resName').innerText = payload.full_name;
+    document.getElementById('resPos').innerText = payload.position;
+    document.getElementById('resEdu').innerText = `${payload.education_level} - ${payload.school_department}`;
+    document.getElementById('resPhone').innerText = payload.phone;
+    document.getElementById('resEmail').innerText = payload.email;
+}
+</script>
+
+</body>
+</html>
