@@ -77,6 +77,19 @@ python scripts/test_ik.py
 
 ---
 
+## 🌐 Kurumsal İK & E-Dönüşüm Açık Kaynak Ekosistemi
+
+Bu aday takip sistemi, [@eimza-kep](https://github.com/eimza-kep) açık kaynak ekosisteminin insan kaynakları işe alım modülüdür. İlgili diğer araçlar:
+
+* 🔒 [kurumsal-kvkk-basvuru-scripti](https://github.com/eimza-kep/kurumsal-kvkk-basvuru-scripti) - Çalışan adayları için KVKK aydınlatma metni ve açık rıza onay portali.
+* 📊 [muhasebe-excel-sablonlari](https://github.com/eimza-kep/muhasebe-excel-sablonlari) - Personel bordro maliyeti, asgari ücret istisnası ve kıdem tazminatı hesaplama tabloları.
+* 📄 [python-pdf-eimza-dogrulayici](https://github.com/eimza-kep/python-pdf-eimza-dogrulayici) - İşe alımda imzalanan dijital iş sözleşmeleri ve gizlilik taahhütnameleri doğrulama kütüphanesi.
+* 🏢 [kurumsal-isg-ziyaretci-kayit-scripti](https://github.com/eimza-kep/kurumsal-isg-ziyaretci-kayit-scripti) - Kurum içi mülakatlara gelen adaylar için İSG ziyaretçi kayıt portali.
+* 🌟 [awesome-turkiye-e-donusum](https://github.com/eimza-kep/awesome-turkiye-e-donusum) - Türkiye e-Dönüşüm açık kaynak araçları ve kütüphaneleri kürasyonu.
+
+---
+
 ## ⚖️ Lisans
 
 Bu proje [MIT Lisansı](LICENSE) kapsamında açık kaynak olarak sunulmuştur.
+
