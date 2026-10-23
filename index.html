@@ -137,6 +137,11 @@
                         <option value="Belirtilmedi">Uygulanamaz / Belirtilmedi</option>
                     </select>
                 </div>
+                <div class="form-group full">
+                    <label>Varsa KEP (Kayıtlı Elektronik Posta) Adresiniz</label>
+                    <input type="text" id="kepAddress" placeholder="ornek@hs01.kep.tr (Resmi iş teklifi & sözleşme iletimi için - isteğe bağlı)">
+                    <small style="color:var(--text-muted); font-size:0.75rem;">BTK standartlarına uygun KEP adresiniz varsa işe alım teklif mektubu resmi kanaldan iletilebilir.</small>
+                </div>
             </div>
         </div>
 
@@ -231,11 +236,19 @@
 
 <script>
 let cvFileName = "";
+let cvBase64 = "";
 
 function handleCvSelect(input) {
     if (input.files.length > 0) {
-        cvFileName = input.files[0].name;
-        document.getElementById('cvDisplay').innerText = `✅ Seçilen CV: ${cvFileName}`;
+        const file = input.files[0];
+        cvFileName = file.name;
+        document.getElementById('cvDisplay').innerText = `✅ Seçilen CV: ${cvFileName} (${(file.size / 1024).toFixed(1)} KB)`;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            cvBase64 = e.target.result;
+        };
+        reader.readAsDataURL(file);
     }
 }
 
@@ -258,7 +271,9 @@ async function submitIkForm(e) {
         experience_years: document.getElementById('experienceYears').value,
         salary_expectation: document.getElementById('salaryExpectation').value.trim(),
         linkedin_url: document.getElementById('linkedinUrl').value.trim(),
+        kep_address: document.getElementById('kepAddress').value.trim(),
         cv_file_name: cvFileName,
+        cv_base64: cvBase64,
         cover_letter: document.getElementById('coverLetter').value.trim(),
         created_at: new Date().toISOString()
     };

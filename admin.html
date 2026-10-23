@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İK Yönetim Paneli | Aday ve Başvuru Takip Sistemi</title>
+    <title>İK Yönetim Paneli | Aday ve Başvuru Takip Portalı</title>
     <style>
         :root {
             --primary: #4338ca;
@@ -13,20 +13,28 @@
             --border: #e2e8f0;
             --text-main: #1e293b;
             --text-muted: #64748b;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --info: #0284c7;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background: var(--bg); color: var(--text-main); line-height: 1.5; padding: 24px; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1240px; margin: 0 auto; }
         .navbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 18px 24px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
         .navbar h1 { font-size: 1.3rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px; }
         .nav-actions { display: flex; gap: 10px; }
         .btn { padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: white; color: var(--text-main); transition: 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .btn:hover { background: #f1f5f9; }
         .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
         .btn-primary:hover { background: var(--primary-hover); }
+        .btn-success { background: var(--success); color: white; border-color: var(--success); }
+        .btn-success:hover { background: #15803d; }
+        .btn-sm { padding: 5px 10px; font-size: 0.78rem; border-radius: 4px; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .stat-card { background: white; padding: 18px; border-radius: 10px; border: 1px solid var(--border); }
-        .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+        .stat-card { background: white; padding: 18px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .stat-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .stat-val { font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-top: 4px; }
 
         .filter-bar { background: white; padding: 16px 20px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
@@ -37,20 +45,28 @@
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
         th { background: #f8fafc; padding: 12px 16px; font-weight: 700; color: #475569; border-bottom: 1px solid var(--border); white-space: nowrap; }
         td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-        tr:hover { background: #f1f5f9; }
+        tr:hover { background: #f8fafc; }
 
         .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
         .badge-pending { background: #fef3c7; color: #b45309; }
+        .badge-screened { background: #e0e7ff; color: #4338ca; }
         .badge-interview { background: #dbeafe; color: #1e40af; }
         .badge-offer { background: #dcfce7; color: #15803d; }
+        .badge-hired { background: #bbf7d0; color: #14532d; font-weight: 800; }
         .badge-rejected { background: #fee2e2; color: #b91c1c; }
+        .badge-kep { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 20px; z-index: 50; }
-        .modal-card { background: white; width: 100%; max-width: 650px; border-radius: 12px; padding: 24px; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; }
+        /* Modals */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); align-items: center; justify-content: center; padding: 20px; z-index: 100; backdrop-filter: blur(2px); }
+        .modal-card { background: white; width: 100%; max-width: 720px; border-radius: 14px; padding: 26px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 16px; }
+        .modal-header h3 { font-size: 1.15rem; color: #0f172a; font-weight: 800; }
         .detail-row { display: flex; margin-bottom: 10px; font-size: 0.88rem; }
-        .detail-lbl { width: 160px; font-weight: 600; color: var(--text-muted); }
+        .detail-lbl { width: 170px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; }
         .detail-val { flex: 1; color: var(--text-main); }
+
+        .btn-group-cv { display: flex; gap: 8px; margin-top: 6px; }
+        .offer-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 14px; font-family: monospace; font-size: 0.82rem; white-space: pre-wrap; max-height: 320px; overflow-y: auto; color: #334155; }
     </style>
 </head>
 <body>
@@ -71,7 +87,7 @@
             <div class="stat-val" id="statTotal">0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">İncelemede</div>
+            <div class="stat-label">İncelemede & Ön Eleme</div>
             <div class="stat-val" id="statPending" style="color: #b45309;">0</div>
         </div>
         <div class="stat-card">
@@ -79,13 +95,13 @@
             <div class="stat-val" id="statInterview" style="color: #1e40af;">0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Teklif Yapılan / Kabul</div>
+            <div class="stat-label">Teklif & İşe Alım</div>
             <div class="stat-val" id="statOffer" style="color: #15803d;">0</div>
         </div>
     </div>
 
     <div class="filter-bar">
-        <input type="text" id="searchInput" placeholder="İsim, TCKN, Pozisyon veya Telefon ara..." oninput="filterData()">
+        <input type="text" id="searchInput" placeholder="İsim, TCKN, Pozisyon, KEP veya Telefon ara..." oninput="filterData()">
         <select id="filterPos" onchange="filterData()">
             <option value="">Tüm Pozisyonlar</option>
             <option value="Yazılım Geliştirici (Fullstack / Backend)">Yazılım Geliştirici</option>
@@ -98,8 +114,10 @@
         <select id="filterStatus" onchange="filterData()">
             <option value="">Tüm Durumlar</option>
             <option value="Degerlendiriliyor">Değerlendiriliyor</option>
+            <option value="On Eleme Gecti">Ön Eleme Geçti</option>
             <option value="Mulakata Cagrildi">Mülakata Çağrıldı</option>
             <option value="Teklif Yapildi">Teklif Yapıldı</option>
+            <option value="Ise Alindi">İşe Alındı</option>
             <option value="Reddedildi">Reddedildi</option>
         </select>
     </div>
@@ -112,7 +130,7 @@
                     <th>Aday Adı Soyadı</th>
                     <th>Pozisyon</th>
                     <th>Eğitim & Deneyim</th>
-                    <th>Şehir</th>
+                    <th>KEP & İletişim</th>
                     <th>Tarih</th>
                     <th>Durum</th>
                     <th>İşlem</th>
@@ -130,21 +148,97 @@
     <div class="modal-card">
         <div class="modal-header">
             <h3 id="modalTitle">Aday Detayı</h3>
-            <button onclick="closeModal()" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✖</button>
+            <button onclick="closeModal('detailModal')" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✖</button>
         </div>
         <div id="modalBody"></div>
-        <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 14px;">
+        <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 14px; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; gap: 8px; align-items: center;">
-                <label style="font-size: 0.85rem; font-weight: 600;">Durumu Değiştir:</label>
+                <label style="font-size: 0.85rem; font-weight: 600;">Aşama:</label>
                 <select id="changeStatusSelect" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.85rem;">
                     <option value="Degerlendiriliyor">Değerlendiriliyor</option>
+                    <option value="On Eleme Gecti">Ön Eleme Geçti</option>
                     <option value="Mulakata Cagrildi">Mülakata Çağrıldı</option>
                     <option value="Teklif Yapildi">Teklif Yapıldı</option>
+                    <option value="Ise Alindi">İşe Alındı</option>
                     <option value="Reddedildi">Reddedildi</option>
                 </select>
-                <button class="btn btn-primary" onclick="updateCurrentStatus()">Kaydet</button>
+                <button class="btn btn-primary btn-sm" onclick="updateCurrentStatus()">Kaydet</button>
             </div>
-            <button class="btn" onclick="window.print()">🖨️ Yazdır</button>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn btn-sm" onclick="openCvModal()">📄 CV Önizle</button>
+                <button class="btn btn-success btn-sm" onclick="openOfferModal()">📨 KEP İş Teklifi Hazırla</button>
+                <button class="btn btn-sm" onclick="window.print()">🖨️ Yazdır</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CV Preview & Download Modal -->
+<div class="modal" id="cvModal">
+    <div class="modal-card" style="max-width: 850px;">
+        <div class="modal-header">
+            <h3 id="cvModalTitle">📄 Aday CV / Özgeçmiş Önizleme</h3>
+            <button onclick="closeModal('cvModal')" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✖</button>
+        </div>
+        <div id="cvModalBody" style="min-height: 420px;"></div>
+        <div style="margin-top: 16px; display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 12px;">
+            <button class="btn" onclick="closeModal('cvModal')">Kapat</button>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn" onclick="printCvContent()">🖨️ CV Çıktısı Al</button>
+                <button class="btn btn-primary" id="cvDownloadBtn" onclick="downloadActiveCv()">⬇️ CV Dosyasını İndir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KEP & E-Signature Job Offer Modal -->
+<div class="modal" id="offerModal">
+    <div class="modal-card" style="max-width: 800px;">
+        <div class="modal-header">
+            <h3>📨 KEP ve E-İmza Uyumlu Resmi İş Teklifi Hazırla</h3>
+            <button onclick="closeModal('offerModal')" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✖</button>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">Aday Adı Soyadı</label>
+                <input type="text" id="offerCandidateName" readonly style="width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: #f1f5f9; font-weight: 600;">
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">Aday KEP Adresi</label>
+                <input type="text" id="offerCandidateKep" placeholder="isim.soyisim@hs01.kep.tr" style="width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;">
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">Pozisyon / Unvan</label>
+                <input type="text" id="offerPosition" readonly style="width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; background: #f1f5f9;">
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">Aylık Net Ücret / Maaş</label>
+                <input type="text" id="offerSalary" placeholder="Örn: 55.000 TL Net" style="width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-weight: 600;">
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">İşe Başlama Tarihi</label>
+                <input type="date" id="offerStartDate" style="width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;">
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); display:block; margin-bottom:4px;">Şirket KEP Gönderim Adresi</label>
+                <input type="text" id="offerCompanyKep" value="ik@kurumsal.kep.tr" style="width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;">
+            </div>
+        </div>
+
+        <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <button class="btn btn-primary" onclick="generateOfferText()">⚙️ Resmi Teklif Metnini Üret</button>
+            <span id="offerStatusMsg" style="font-size: 0.8rem; color: var(--success); font-weight: 600;"></span>
+        </div>
+
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">4857 Sayılı İş Kanunu ve 5070 E-İmza Uyumlu Mektup Önizlemesi:</div>
+        <div class="offer-box" id="offerPreviewText">Teklif metnini oluşturmak için yukarıdaki "Resmi Teklif Metnini Üret" butonuna basınız...</div>
+
+        <div style="margin-top: 16px; display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 12px;">
+            <button class="btn" onclick="closeModal('offerModal')">Kapat</button>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn" onclick="copyOfferText()">📋 Metni Kopyala</button>
+                <button class="btn btn-success" onclick="saveAndPrintOffer()">🖨️ Teklifi Kaydet ve Yazdır</button>
+            </div>
         </div>
     </div>
 </div>
@@ -180,6 +274,7 @@ function render() {
         const matchesQ = !q || (d.full_name && d.full_name.toLowerCase().includes(q)) ||
                               (d.id_number && d.id_number.includes(q)) ||
                               (d.phone && d.phone.includes(q)) ||
+                              (d.kep_address && d.kep_address.toLowerCase().includes(q)) ||
                               (d.tracking_code && d.tracking_code.toLowerCase().includes(q));
         const matchesPos = !fPos || d.position === fPos;
         const matchesStatus = !fStatus || (d.status || 'Degerlendiriliyor') === fStatus;
@@ -188,9 +283,9 @@ function render() {
 
     // Update stats
     document.getElementById('statTotal').innerText = allData.length;
-    document.getElementById('statPending').innerText = allData.filter(x => (x.status || 'Degerlendiriliyor') === 'Degerlendiriliyor').length;
+    document.getElementById('statPending').innerText = allData.filter(x => ['Degerlendiriliyor', 'On Eleme Gecti'].includes(x.status || 'Degerlendiriliyor')).length;
     document.getElementById('statInterview').innerText = allData.filter(x => x.status === 'Mulakata Cagrildi').length;
-    document.getElementById('statOffer').innerText = allData.filter(x => x.status === 'Teklif Yapildi').length;
+    document.getElementById('statOffer').innerText = allData.filter(x => ['Teklif Yapildi', 'Ise Alindi'].includes(x.status)).length;
 
     const tbody = document.getElementById('tableBody');
     if (filtered.length === 0) {
@@ -202,23 +297,26 @@ function render() {
         const st = d.status || 'Degerlendiriliyor';
         let badgeClass = 'badge-pending';
         let stLabel = 'Değerlendiriliyor';
+        if (st === 'On Eleme Gecti') { badgeClass = 'badge-screened'; stLabel = 'Ön Eleme'; }
         if (st === 'Mulakata Cagrildi') { badgeClass = 'badge-interview'; stLabel = 'Mülakat'; }
         if (st === 'Teklif Yapildi') { badgeClass = 'badge-offer'; stLabel = 'Teklif Yapıldı'; }
+        if (st === 'Ise Alindi') { badgeClass = 'badge-hired'; stLabel = 'İşe Alındı'; }
         if (st === 'Reddedildi') { badgeClass = 'badge-rejected'; stLabel = 'Reddedildi'; }
 
         const dateStr = d.created_at ? new Date(d.created_at).toLocaleDateString('tr-TR') : '-';
+        const kepTag = d.kep_address ? `<br><span class="badge-kep">📬 ${escapeHtml(d.kep_address)}</span>` : '';
 
         return `
             <tr>
-                <td><b>${d.tracking_code || 'BASVURU-2026-'+i}</b></td>
+                <td><b>${escapeHtml(d.tracking_code || 'BASVURU-2026-'+i)}</b></td>
                 <td><b>${escapeHtml(d.full_name || '')}</b><br><small style="color:var(--text-muted)">${escapeHtml(d.phone || '')}</small></td>
                 <td>${escapeHtml(d.position || '')}</td>
                 <td>${escapeHtml(d.education_level || '')}<br><small style="color:var(--text-muted)">${escapeHtml(d.experience_years || '')}</small></td>
-                <td>${escapeHtml(d.city || '')}</td>
+                <td><small>${escapeHtml(d.email || '')}</small>${kepTag}</td>
                 <td>${dateStr}</td>
                 <td><span class="badge ${badgeClass}">${stLabel}</span></td>
                 <td>
-                    <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="viewDetail(${i})">Detay</button>
+                    <button class="btn btn-sm" onclick="viewDetail(${i})">Detay</button>
                 </td>
             </tr>
         `;
@@ -234,18 +332,23 @@ function viewDetail(idx) {
     document.getElementById('modalTitle').innerText = `${activeItem.full_name} - ${activeItem.tracking_code || ''}`;
     document.getElementById('changeStatusSelect').value = activeItem.status || 'Degerlendiriliyor';
 
+    const hasKep = activeItem.kep_address ? `<span class="badge-kep">📬 ${escapeHtml(activeItem.kep_address)}</span> (BTK Kayıtlı)` : '<span style="color:#94a3b8">Belirtilmedi</span>';
+    const cvInfo = activeItem.cv_file_name ? `<b>${escapeHtml(activeItem.cv_file_name)}</b> ${activeItem.cv_base64 ? '(Dijital Dosya Hazır)' : ''}` : '<span style="color:#94a3b8">Dosya Yüklenmedi</span>';
+
     const b = document.getElementById('modalBody');
     b.innerHTML = `
         <div class="detail-row"><div class="detail-lbl">Pozisyon:</div><div class="detail-val"><b>${escapeHtml(activeItem.position || '')}</b></div></div>
         <div class="detail-row"><div class="detail-lbl">TCKN:</div><div class="detail-val">${escapeHtml(activeItem.id_number || '')}</div></div>
         <div class="detail-row"><div class="detail-lbl">Telefon / E-Posta:</div><div class="detail-val">${escapeHtml(activeItem.phone || '')} | ${escapeHtml(activeItem.email || '')}</div></div>
+        <div class="detail-row"><div class="detail-lbl">KEP Adresi:</div><div class="detail-val">${hasKep}</div></div>
         <div class="detail-row"><div class="detail-lbl">Şehir:</div><div class="detail-val">${escapeHtml(activeItem.city || '')}</div></div>
-        <div class="detail-row"><div class="detail-lbl">Askerlik:</div><div class="detail-val">${escapeHtml(activeItem.military_status || '')}</div></div>
+        <div class="detail-row"><div class="detail-lbl">Askerlik Durumu:</div><div class="detail-val">${escapeHtml(activeItem.military_status || '')}</div></div>
         <div class="detail-row"><div class="detail-lbl">Eğitim Düzeyi:</div><div class="detail-val">${escapeHtml(activeItem.education_level || '')} - ${escapeHtml(activeItem.school_department || '')}</div></div>
         <div class="detail-row"><div class="detail-lbl">Deneyim:</div><div class="detail-val">${escapeHtml(activeItem.experience_years || '')}</div></div>
         <div class="detail-row"><div class="detail-lbl">Maaş Beklentisi:</div><div class="detail-val">${escapeHtml(activeItem.salary_expectation || 'Belirtilmedi')}</div></div>
         <div class="detail-row"><div class="detail-lbl">LinkedIn:</div><div class="detail-val"><a href="${escapeHtml(activeItem.linkedin_url || '#')}" target="_blank">${escapeHtml(activeItem.linkedin_url || 'Yok')}</a></div></div>
-        <div class="detail-row"><div class="detail-lbl">Özgeçmiş Dosyası:</div><div class="detail-val">${escapeHtml(activeItem.cv_file_name || 'Yüklenmedi')}</div></div>
+        <div class="detail-row"><div class="detail-lbl">Özgeçmiş (CV):</div><div class="detail-val">${cvInfo}</div></div>
+        ${activeItem.offer_salary ? `<div class="detail-row" style="background:#ecfdf5; padding:6px 8px; border-radius:6px;"><div class="detail-lbl" style="color:#047857;">Onaylanan Teklif:</div><div class="detail-val" style="color:#047857;"><b>${escapeHtml(activeItem.offer_salary)}</b> (Başlama: ${escapeHtml(activeItem.offer_start_date || '-')})</div></div>` : ''}
         <div style="margin-top: 12px; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
             <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 4px;">Aday Ön Yazısı:</div>
             <div style="font-size: 0.85rem; color: #475569; white-space: pre-wrap;">${escapeHtml(activeItem.cover_letter || 'Ön yazı bulunmuyor.')}</div>
@@ -255,7 +358,9 @@ function viewDetail(idx) {
     document.getElementById('detailModal').style.display = 'flex';
 }
 
-function closeModal() { document.getElementById('detailModal').style.display = 'none'; }
+function closeModal(modalId) { 
+    document.getElementById(modalId).style.display = 'none'; 
+}
 
 async function updateCurrentStatus() {
     if (!activeItem) return;
@@ -270,17 +375,174 @@ async function updateCurrentStatus() {
         });
     } catch (e) {}
 
-    // Update local storage too
     localStorage.setItem('ik_basvurular', JSON.stringify(allData));
-    closeModal();
+    closeModal('detailModal');
     render();
+}
+
+// CV Preview & Download
+function openCvModal() {
+    if (!activeItem) return;
+    document.getElementById('cvModalTitle').innerText = `📄 ${activeItem.full_name} - CV Önizleme`;
+    const box = document.getElementById('cvModalBody');
+
+    if (activeItem.cv_base64 && activeItem.cv_base64.startsWith('data:application/pdf')) {
+        box.innerHTML = `<iframe src="${activeItem.cv_base64}" style="width:100%; height:500px; border:1px solid var(--border); border-radius:8px;"></iframe>`;
+        document.getElementById('cvDownloadBtn').style.display = 'inline-flex';
+    } else if (activeItem.cv_base64 && activeItem.cv_base64.startsWith('data:image')) {
+        box.innerHTML = `<div style="text-align:center;"><img src="${activeItem.cv_base64}" style="max-width:100%; max-height:500px; border-radius:8px; border:1px solid var(--border);"></div>`;
+        document.getElementById('cvDownloadBtn').style.display = 'inline-flex';
+    } else {
+        // Render structured Digital CV Sheet
+        box.innerHTML = `
+            <div style="padding: 24px; border: 1px solid var(--border); border-radius: 8px; background: white;" id="printableCvSheet">
+                <div style="border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 16px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h2 style="color: #0f172a; margin: 0; font-size: 1.4rem;">${escapeHtml(activeItem.full_name)}</h2>
+                        <div style="color: var(--primary); font-weight: 700; font-size: 1rem; margin-top:2px;">${escapeHtml(activeItem.position)}</div>
+                    </div>
+                    <div style="text-align: right; font-size: 0.8rem; color: var(--text-muted);">
+                        <b>Takip No:</b> ${escapeHtml(activeItem.tracking_code || '')}<br>
+                        <b>Tarih:</b> ${activeItem.created_at ? new Date(activeItem.created_at).toLocaleDateString('tr-TR') : '-'}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.88rem; margin-bottom: 16px;">
+                    <div><b>TCKN:</b> ${escapeHtml(activeItem.id_number || '-')}</div>
+                    <div><b>Telefon:</b> ${escapeHtml(activeItem.phone || '-')}</div>
+                    <div><b>E-Posta:</b> ${escapeHtml(activeItem.email || '-')}</div>
+                    <div><b>Şehir:</b> ${escapeHtml(activeItem.city || '-')}</div>
+                    <div><b>KEP Adresi:</b> ${escapeHtml(activeItem.kep_address || 'Belirtilmedi')}</div>
+                    <div><b>Askerlik:</b> ${escapeHtml(activeItem.military_status || '-')}</div>
+                </div>
+
+                <div style="background: #f8fafc; padding: 14px; border-radius: 6px; margin-bottom: 14px; border: 1px solid var(--border);">
+                    <div style="font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 6px;">🎓 Öğrenim ve İş Tecrübesi</div>
+                    <div style="font-size: 0.88rem;"><b>Eğitim Durumu:</b> ${escapeHtml(activeItem.education_level || '')} - ${escapeHtml(activeItem.school_department || '')}</div>
+                    <div style="font-size: 0.88rem; margin-top: 4px;"><b>Toplam Tecrübe:</b> ${escapeHtml(activeItem.experience_years || '')}</div>
+                    <div style="font-size: 0.88rem; margin-top: 4px;"><b>Maaş Beklentisi:</b> ${escapeHtml(activeItem.salary_expectation || 'Belirtilmedi')}</div>
+                    ${activeItem.linkedin_url ? `<div style="font-size: 0.88rem; margin-top: 4px;"><b>LinkedIn:</b> ${escapeHtml(activeItem.linkedin_url)}</div>` : ''}
+                </div>
+
+                <div style="border: 1px solid var(--border); padding: 14px; border-radius: 6px;">
+                    <div style="font-weight: 700; font-size: 0.9rem; color: #1e293b; margin-bottom: 6px;">✍️ Aday Ön Yazısı ve Yetkinlikler</div>
+                    <div style="font-size: 0.85rem; color: #475569; white-space: pre-wrap; line-height: 1.6;">${escapeHtml(activeItem.cover_letter || 'Ön yazı girilmemiştir.')}</div>
+                </div>
+            </div>
+        `;
+        document.getElementById('cvDownloadBtn').style.display = 'none';
+    }
+
+    document.getElementById('cvModal').style.display = 'flex';
+}
+
+function downloadActiveCv() {
+    if (!activeItem || !activeItem.cv_base64) {
+        alert('İndirilebilir dijital dosya bulunamadı.');
+        return;
+    }
+    const link = document.createElement('a');
+    link.href = activeItem.cv_base64;
+    link.download = `${activeItem.full_name.replace(/[^a-zA-Z0-9]/g, '_')}_CV.${activeItem.cv_file_name ? activeItem.cv_file_name.split('.').pop() : 'pdf'}`;
+    link.click();
+}
+
+function printCvContent() {
+    window.print();
+}
+
+// KEP & E-Signature Offer Generation
+function openOfferModal() {
+    if (!activeItem) return;
+    document.getElementById('offerCandidateName').value = activeItem.full_name || '';
+    document.getElementById('offerCandidateKep').value = activeItem.kep_address || '';
+    document.getElementById('offerPosition').value = activeItem.position || '';
+    document.getElementById('offerSalary').value = activeItem.salary_expectation || '50.000 TL Net';
+    
+    const twoWeeksLater = new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString().split('T')[0];
+    document.getElementById('offerStartDate').value = twoWeeksLater;
+
+    document.getElementById('offerStatusMsg').innerText = '';
+    document.getElementById('offerPreviewText').innerText = 'Teklif metnini oluşturmak için yukarıdaki "Resmi Teklif Metnini Üret" butonuna basınız...';
+
+    document.getElementById('offerModal').style.display = 'flex';
+}
+
+async function generateOfferText() {
+    if (!activeItem) return;
+    const salary = document.getElementById('offerSalary').value.trim();
+    const startDate = document.getElementById('offerStartDate').value;
+    const candKep = document.getElementById('offerCandidateKep').value.trim();
+    const compKep = document.getElementById('offerCompanyKep').value.trim();
+
+    try {
+        const res = await fetch('/api/teklif-olustur', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tracking_code: activeItem.tracking_code,
+                candidate_kep: candKep,
+                salary: salary,
+                start_date: startDate,
+                company_name: 'Akıllı Kurumsal Çözümler A.Ş.',
+                company_kep: compKep,
+                probation_period: '2 Ay'
+            })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            document.getElementById('offerPreviewText').innerText = data.offer_letter;
+            document.getElementById('offerStatusMsg').innerText = '✅ Teklif oluşturuldu ve sisteme kaydedildi!';
+            activeItem.status = 'Teklif Yapildi';
+            activeItem.offer_salary = salary;
+            activeItem.offer_start_date = startDate;
+            activeItem.offer_letter_text = data.offer_letter;
+            render();
+            return;
+        }
+    } catch (e) {}
+
+    // Offline / Local fallback text generator
+    const fallbackOffer = `T.C. KEP VE E-İMZA MEVZUATINA UYGUN RESMİ İŞ VE ÇALIŞMA TEKLİFİ\n` +
+`Tarih: ${new Date().toLocaleDateString('tr-TR')}\n` +
+`Referans: ${activeItem.tracking_code || 'IK-TEKLIF-2026'}\n\n` +
+`Sayın: ${activeItem.full_name}\n` +
+`TC Kimlik No: ${activeItem.id_number || 'TR'}\n` +
+`Aday KEP Adresi: ${candKep || 'Belirtilmedi'}\n\n` +
+`Şirketimiz nezdinde gerçekleştirilen mülakat ve değerlendirmeler neticesinde, aşağıda belirtilen şartlarla tarafınıza iş teklifinde bulunmaktan memnuniyet duyarız:\n\n` +
+`1. Pozisyon / Unvan: ${activeItem.position}\n` +
+`2. Göreve Başlama Tarihi: ${startDate || 'Belirtilen tarihte'}\n` +
+`3. Aylık Net Ücret: ${salary}\n` +
+`4. Deneme Süresi: 2 Ay (4857 Sayılı İş Kanunu m.15)\n` +
+`5. Gönderici KEP: ${compKep}\n\n` +
+`Bu teklif 5070 Sayılı Elektronik İmza Kanunu ve Kayıtlı Elektronik Posta (KEP) sistemi esaslarına göre düzenlenmiş olup kabul beyanınızı KEP veya ıslak imzalı nüsha ile iletmeniz rica olunur.`;
+
+    document.getElementById('offerPreviewText').innerText = fallbackOffer;
+    document.getElementById('offerStatusMsg').innerText = '✅ Teklif metni yerel olarak hazırlandı!';
+    activeItem.status = 'Teklif Yapildi';
+    activeItem.offer_salary = salary;
+    activeItem.offer_start_date = startDate;
+    localStorage.setItem('ik_basvurular', JSON.stringify(allData));
+    render();
+}
+
+function copyOfferText() {
+    const txt = document.getElementById('offerPreviewText').innerText;
+    navigator.clipboard.writeText(txt).then(() => {
+        alert('Teklif metni panoya kopyalandı! KEP istemcinize veya e-posta taslağınıza yapıştırabilirsiniz.');
+    });
+}
+
+function saveAndPrintOffer() {
+    window.print();
 }
 
 function exportCSV() {
     if (!allData || allData.length === 0) { alert('Dışa aktarılacak başvuru verisi bulunamadı.'); return; }
-    let csv = '\uFEFFTakip No,Aday Adı Soyadı,TCKN,Telefon,E-Posta,Pozisyon,Eğitim,Bölüm,Deneyim,Maaş Beklentisi,Şehir,Durum,Tarih\n';
+    let csv = '\uFEFFTakip No,Aday Adı Soyadı,TCKN,Telefon,E-Posta,KEP Adresi,Pozisyon,Eğitim,Bölüm,Deneyim,Maaş Beklentisi,Teklif Edilen Maaş,Başlama Tarihi,Şehir,Durum,Tarih\n';
     allData.forEach(d => {
-        csv += `"${d.tracking_code || ''}","${d.full_name || ''}","${d.id_number || ''}","${d.phone || ''}","${d.email || ''}","${d.position || ''}","${d.education_level || ''}","${d.school_department || ''}","${d.experience_years || ''}","${d.salary_expectation || ''}","${d.city || ''}","${d.status || 'Degerlendiriliyor'}","${d.created_at || ''}"\n`;
+        csv += `"${d.tracking_code || ''}","${d.full_name || ''}","${d.id_number || ''}","${d.phone || ''}","${d.email || ''}","${d.kep_address || ''}","${d.position || ''}","${d.education_level || ''}","${d.school_department || ''}","${d.experience_years || ''}","${d.salary_expectation || ''}","${d.offer_salary || ''}","${d.offer_start_date || ''}","${d.city || ''}","${d.status || 'Degerlendiriliyor'}","${d.created_at || ''}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -291,7 +553,7 @@ function exportCSV() {
 }
 
 function escapeHtml(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 window.onload = fetchData;
