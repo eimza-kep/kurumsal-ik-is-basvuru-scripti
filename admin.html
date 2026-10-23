@@ -76,7 +76,8 @@
         <h1>👥 Kurumsal İK & İşe Alım Paneli</h1>
         <div class="nav-actions">
             <a href="/" class="btn" target="_blank">🌐 Başvuru Formu</a>
-            <button class="btn btn-primary" onclick="exportCSV()">📥 CSV Dışa Aktar</button>
+            <a href="/api/ik-faaliyet-raporu-html" target="_blank" class="btn" style="background:#0284c7; color:white; border-color:#0284c7;">📊 İK Faaliyet Raporu</a>
+            <a href="/api/export-csv" class="btn btn-primary">📥 CSV Dışa Aktar</a>
             <button class="btn" onclick="fetchData()">🔄 Yenile</button>
         </div>
     </div>
@@ -243,6 +244,83 @@
     </div>
 </div>
 
+<!-- Interview Scorecard Modal -->
+<div class="modal" id="scorecardModal">
+    <div class="modal-card" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3 id="scorecardCandidateTitle">🎙️ Mülakat Değerlendirme &amp; Puanlama Kartı</h3>
+            <button onclick="closeModal('scorecardModal')" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✖</button>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
+            Adayı yetkinlik bazlı değerlendirerek genel işe alım skorunu otomatik hesaplayınız.
+        </p>
+        <input type="hidden" id="scorecardTrackingCode">
+        
+        <div style="display:flex; flex-direction:column; gap:12px; font-size:0.85rem;">
+            <div>
+                <label style="font-weight:700;">1. Teknik Yetkinlik &amp; Mesleki Bilgi (Ağırlık: %35):</label>
+                <select id="scoreTech" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); margin-top:4px;">
+                    <option value="5">5 - Mükemmel (Uzman seviye, teknik soruları eksiksiz yanıtladı)</option>
+                    <option value="4" selected>4 - Çok İyi (Pozisyon gereksinimlerine hakim)</option>
+                    <option value="3">3 - Yeterli (Temel bilgiye sahip, geliştirilebilir)</option>
+                    <option value="2">2 - Gelişime Açık (Beklentilerin altında kaldı)</option>
+                    <option value="1">1 - Yetersiz (Pozisyon seviyesinin çok gerisinde)</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight:700;">2. İletişim, İfade &amp; Takım Çalışması (Ağırlık: %25):</label>
+                <select id="scoreComm" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); margin-top:4px;">
+                    <option value="5">5 - Mükemmel (Açık, ikna edici, yüksek empati)</option>
+                    <option value="4" selected>4 - Çok İyi (Kendini rahat ifade ediyor)</option>
+                    <option value="3">3 - Yeterli (Ortalama iletişim düzeyi)</option>
+                    <option value="2">2 - Zayıf (Çekingen veya gergin)</option>
+                    <option value="1">1 - Yetersiz (İletişim kurmakta zorlandı)</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight:700;">3. Problem Çözme &amp; Analitik Düşünce (Ağırlık: %20):</label>
+                <select id="scoreProb" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); margin-top:4px;">
+                    <option value="5">5 - Mükemmel (Hızlı, yaratıcı ve pratik çözümler)</option>
+                    <option value="4" selected>4 - Çok İyi (Mantıksal yaklaşımı kuvvetli)</option>
+                    <option value="3">3 - Yeterli (Standart yöntemleri biliyor)</option>
+                    <option value="2">2 - Zayıf (Karmaşık durumlarda tıkandı)</option>
+                    <option value="1">1 - Yetersiz</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight:700;">4. Şirket Kültürüne &amp; Değerlerine Uyum (Ağırlık: %20):</label>
+                <select id="scoreCult" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); margin-top:4px;">
+                    <option value="5" selected>5 - Mükemmel (Kültür elçisi olabilecek nitelikte)</option>
+                    <option value="4">4 - Çok İyi (Takıma hızlı adapte olur)</option>
+                    <option value="3">3 - Yeterli (Uyum sağlayabilir)</option>
+                    <option value="2">2 - Şüpheli (Kültürel uyumsuzluk riski)</option>
+                    <option value="1">1 - Uyumsuz</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight:700;">Sonuç Tavsiyesi:</label>
+                <select id="scoreRec" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); margin-top:4px;">
+                    <option value="Teklif Önerilir" selected>✅ Teklif Önerilir (Öncelikli Aday)</option>
+                    <option value="Yedek Aday">⏳ Yedek Aday (İkinci Tur Değerlendirmesi)</option>
+                    <option value="Olumsuz">❌ Olumsuz (Süreç Sonlandırılmalı)</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-weight:700;">Mülakatçı Görüş &amp; Değerlendirme Notu:</label>
+                <textarea id="scoreNotes" rows="3" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); margin-top:4px;" placeholder="Adayın güçlü yanları, dikkat çeken noktaları..."></textarea>
+            </div>
+        </div>
+
+        <div style="margin-top: 18px; display: flex; justify-content: space-between; align-items:center; border-top: 1px solid var(--border); padding-top: 14px;">
+            <span id="scorecardMsg" style="font-size:0.85rem; font-weight:700; color:var(--success);"></span>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn" onclick="closeModal('scorecardModal')">İptal</button>
+                <button class="btn btn-primary" onclick="submitInterviewScorecard()">💾 Puanlamayı Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 let allData = [];
 let activeItem = null;
@@ -316,14 +394,61 @@ function render() {
                 <td>${dateStr}</td>
                 <td><span class="badge ${badgeClass}">${stLabel}</span></td>
                 <td>
-                    <button class="btn btn-sm" onclick="viewDetail(${i})">Detay</button>
+                    <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                        <button class="btn btn-sm" onclick="viewDetail(${i})">Detay</button>
+                        <button class="btn btn-sm" style="background:#e0e7ff; color:#3730a3;" onclick="openScorecardModal('${d.tracking_code}')">🎙️ Mülakat</button>
+                        ${d.offer_salary || d.status === 'Teklif Yapildi' || d.status === 'Ise Alindi' ? `<a href="/api/is-teklifi-html?tracking_code=${encodeURIComponent(d.tracking_code)}" target="_blank" class="btn btn-sm" style="background:#e0f2fe; color:#0369a1;">📄 Teklif</a>` : ''}
+                    </div>
                 </td>
             </tr>
         `;
     }).join('');
 }
 
-function filterData() { render(); }
+function openScorecardModal(trackingCode) {
+    const item = allData.find(x => x.tracking_code === trackingCode);
+    if (!item) return;
+
+    document.getElementById('scorecardTrackingCode').value = trackingCode;
+    document.getElementById('scorecardCandidateTitle').innerText = `🎙️ ${item.full_name} - Mülakat Puanlama`;
+    document.getElementById('scorecardMsg').innerText = '';
+    document.getElementById('scoreNotes').value = item.interview_notes || '';
+    document.getElementById('scorecardModal').style.display = 'flex';
+}
+
+async function submitInterviewScorecard() {
+    const code = document.getElementById('scorecardTrackingCode').value;
+    const payload = {
+        tracking_code: code,
+        technical_score: parseFloat(document.getElementById('scoreTech').value),
+        communication_score: parseFloat(document.getElementById('scoreComm').value),
+        problem_solving_score: parseFloat(document.getElementById('scoreProb').value),
+        cultural_fit_score: parseFloat(document.getElementById('scoreCult').value),
+        recommendation: document.getElementById('scoreRec').value,
+        interviewer_notes: document.getElementById('scoreNotes').value.trim(),
+        interviewer_name: 'İK Değerlendirme Komitesi'
+    };
+
+    try {
+        const res = await fetch('/api/mulakat-degerlendir', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+            const data = await res.json();
+            document.getElementById('scorecardMsg').innerText = `✅ Puanlandı! Skor: ${data.score_result.score_100}/100 (${data.score_result.rating_label})`;
+            setTimeout(() => {
+                closeModal('scorecardModal');
+                fetchData();
+            }, 1200);
+        } else {
+            document.getElementById('scorecardMsg').innerText = 'Kayıt başarısız oldu.';
+        }
+    } catch (e) {
+        document.getElementById('scorecardMsg').innerText = 'Bağlantı hatası.';
+    }
+}
 
 function viewDetail(idx) {
     activeItem = allData[idx];
@@ -348,7 +473,8 @@ function viewDetail(idx) {
         <div class="detail-row"><div class="detail-lbl">Maaş Beklentisi:</div><div class="detail-val">${escapeHtml(activeItem.salary_expectation || 'Belirtilmedi')}</div></div>
         <div class="detail-row"><div class="detail-lbl">LinkedIn:</div><div class="detail-val"><a href="${escapeHtml(activeItem.linkedin_url || '#')}" target="_blank">${escapeHtml(activeItem.linkedin_url || 'Yok')}</a></div></div>
         <div class="detail-row"><div class="detail-lbl">Özgeçmiş (CV):</div><div class="detail-val">${cvInfo}</div></div>
-        ${activeItem.offer_salary ? `<div class="detail-row" style="background:#ecfdf5; padding:6px 8px; border-radius:6px;"><div class="detail-lbl" style="color:#047857;">Onaylanan Teklif:</div><div class="detail-val" style="color:#047857;"><b>${escapeHtml(activeItem.offer_salary)}</b> (Başlama: ${escapeHtml(activeItem.offer_start_date || '-')})</div></div>` : ''}
+        ${activeItem.interview_score ? `<div class="detail-row" style="background:#eff6ff; padding:6px 8px; border-radius:6px;"><div class="detail-lbl" style="color:#1d4ed8;">Mülakat Değerlendirmesi:</div><div class="detail-val" style="color:#1d4ed8;"><b>${activeItem.interview_score}/100</b> (${escapeHtml(activeItem.interview_rating || '')}) - <i>${escapeHtml(activeItem.interview_notes || '')}</i></div></div>` : ''}
+        ${activeItem.offer_salary ? `<div class="detail-row" style="background:#ecfdf5; padding:6px 8px; border-radius:6px;"><div class="detail-lbl" style="color:#047857;">Onaylanan Teklif:</div><div class="detail-val" style="color:#047857;"><b>${escapeHtml(activeItem.offer_salary)}</b> (Başlama: ${escapeHtml(activeItem.offer_start_date || '-')}) &nbsp; <a href="/api/is-teklifi-html?tracking_code=${encodeURIComponent(activeItem.tracking_code)}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:white; padding:2px 8px; text-decoration:none;">📄 A4 Belge</a></div></div>` : ''}
         <div style="margin-top: 12px; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
             <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 4px;">Aday Ön Yazısı:</div>
             <div style="font-size: 0.85rem; color: #475569; white-space: pre-wrap;">${escapeHtml(activeItem.cover_letter || 'Ön yazı bulunmuyor.')}</div>

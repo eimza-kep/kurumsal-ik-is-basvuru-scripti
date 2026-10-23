@@ -24,7 +24,12 @@ if hasattr(sys.stdout, "reconfigure"):
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from scripts.ik_onboarding_engine import (
     validate_candidate_kep,
-    generate_job_offer_document
+    generate_job_offer_document,
+    generate_job_offer_html,
+    calculate_interview_score,
+    calculate_pipeline_analytics,
+    generate_pipeline_report_html,
+    generate_ik_csv_export
 )
 
 PORT = int(os.environ.get("PORT", 8084))
@@ -73,6 +78,14 @@ def init_db():
         cur.execute("ALTER TABLE applications ADD COLUMN offer_start_date TEXT DEFAULT ''")
     if "offer_letter_text" not in cols:
         cur.execute("ALTER TABLE applications ADD COLUMN offer_letter_text TEXT DEFAULT ''")
+    if "interview_score" not in cols:
+        cur.execute("ALTER TABLE applications ADD COLUMN interview_score REAL DEFAULT 0.0")
+    if "interview_rating" not in cols:
+        cur.execute("ALTER TABLE applications ADD COLUMN interview_rating TEXT DEFAULT ''")
+    if "interview_notes" not in cols:
+        cur.execute("ALTER TABLE applications ADD COLUMN interview_notes TEXT DEFAULT ''")
+    if "interviewer_name" not in cols:
+        cur.execute("ALTER TABLE applications ADD COLUMN interviewer_name TEXT DEFAULT ''")
     conn.commit()
     conn.close()
 
@@ -94,6 +107,14 @@ class IKHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_get_stats()
         elif path == "/api/teklif-goruntule":
             self.handle_get_offer(qs)
+        elif path == "/api/is-teklifi-html":
+            self.handle_job_offer_html(qs)
+        elif path == "/api/ik-faaliyet-raporu-json":
+            self.handle_pipeline_report_json()
+        elif path == "/api/ik-faaliyet-raporu-html":
+            self.handle_pipeline_report_html()
+        elif path == "/api/export-csv":
+            self.handle_export_csv()
         elif path == "/api/validate-kep":
             kep = qs.get("kep", [""])[0]
             self.send_json(validate_candidate_kep(kep))
@@ -110,6 +131,8 @@ class IKHandler(http.server.SimpleHTTPRequestHandler):
             self.handle_update_status()
         elif path == "/api/teklif-olustur":
             self.handle_create_offer()
+        elif path == "/api/mulakat-degerlendir":
+            self.handle_evaluate_interview()
         else:
             self.send_error(404, "Endpoint not found")
 
@@ -297,6 +320,135 @@ class IKHandler(http.server.SimpleHTTPRequestHandler):
             })
         except Exception as e:
             self.send_json({"status": "error", "message": str(e)}, status=500)
+
+    def handle_job_offer_html(self, qs):
+        """A4 formatında resmi iş teklifi HTML çıktısı"""
+        tracking_code = qs.get("tracking_code", [""])[0]
+        if not tracking_code:
+            self.send_error(400, "tracking_code parametresi zorunludur.")
+            return
+
+        conn = sqlite3.connect(DB_FILE)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM applications WHERE tracking_code = ?", (tracking_code,))
+        row = cur.fetchone()
+        conn.close()
+
+        if not row:
+            self.send_error(404, "Aday kaydı bulunamadı.")
+            return
+
+        candidate_dict = dict(row)
+        offer_data = {
+            "salary": candidate_dict.get("offer_salary") or candidate_dict.get("salary_expectation", ""),
+            "start_date": candidate_dict.get("offer_start_date") or "",
+            "candidate_kep": candidate_dict.get("kep_address") or ""
+        }
+        html_content = generate_job_offer_html(candidate_dict, offer_data)
+        body = html_content.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def handle_evaluate_interview(self):
+        """Mülakat değerlendirme puanlarını kaydeder ve hesaplar"""
+        length = int(self.headers.get("Content-Length", 0))
+        post_data = self.rfile.read(length)
+        try:
+            data = json.loads(post_data.decode("utf-8"))
+            tracking_code = data.get("tracking_code")
+            if not tracking_code:
+                self.send_json({"status": "error", "message": "tracking_code zorunludur."}, status=400)
+                return
+
+            score_res = calculate_interview_score(data)
+
+            conn = sqlite3.connect(DB_FILE)
+            cur = conn.cursor()
+            cur.execute("""
+                UPDATE applications
+                SET interview_score = ?,
+                    interview_rating = ?,
+                    interview_notes = ?,
+                    interviewer_name = ?
+                WHERE tracking_code = ?
+            """, (
+                score_res["score_100"],
+                score_res["rating_label"],
+                data.get("interviewer_notes", ""),
+                data.get("interviewer_name", "İK Uzmanı"),
+                tracking_code
+            ))
+            conn.commit()
+            conn.close()
+
+            self.send_json({
+                "status": "success",
+                "tracking_code": tracking_code,
+                "score_result": score_res
+            })
+        except Exception as e:
+            self.send_json({"status": "error", "message": str(e)}, status=500)
+
+    def handle_pipeline_report_json(self):
+        """İK Pipeline analitik metrikleri JSON"""
+        try:
+            conn = sqlite3.connect(DB_FILE)
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM applications ORDER BY id DESC")
+            rows = [dict(r) for r in cur.fetchall()]
+            conn.close()
+
+            analytics = calculate_pipeline_analytics(rows)
+            self.send_json({"status": "success", "analytics": analytics})
+        except Exception as e:
+            self.send_json({"status": "error", "message": str(e)}, status=500)
+
+    def handle_pipeline_report_html(self):
+        """A4 formatında İK Yıllık Faaliyet & Pipeline Raporu HTML"""
+        try:
+            conn = sqlite3.connect(DB_FILE)
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM applications ORDER BY id DESC")
+            rows = [dict(r) for r in cur.fetchall()]
+            conn.close()
+
+            analytics = calculate_pipeline_analytics(rows)
+            html_content = generate_pipeline_report_html(analytics)
+            body = html_content.encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        except Exception as e:
+            self.send_error(500, f"Rapor oluşturulurken hata: {e}")
+
+    def handle_export_csv(self):
+        """Excel uyumlu UTF-8 BOM destekli CSV indirme"""
+        try:
+            conn = sqlite3.connect(DB_FILE)
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM applications ORDER BY id DESC")
+            rows = [dict(r) for r in cur.fetchall()]
+            conn.close()
+
+            csv_text = generate_ik_csv_export(rows)
+            body = csv_text.encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/csv; charset=utf-8")
+            self.send_header("Content-Disposition", 'attachment; filename="ik_aday_listesi.csv"')
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        except Exception as e:
+            self.send_error(500, f"CSV oluşturulurken hata: {e}")
 
 if __name__ == "__main__":
     init_db()

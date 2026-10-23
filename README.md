@@ -21,11 +21,13 @@ KOBİ'ler, şirketler ve insan kaynakları departmanları için geliştirilmiş;
 - **Otomatik Başvuru Takip Kodu:** Her başvuruya benzersiz `BASVURU-2026-XXXX` takip numarası ve yazdırılabilir başvuru alındı çıktısı.
 - **Gelişmiş İK Yönetim Paneli (`admin.html`):**
   - **📄 Dahili PDF CV Önizleme ve İndirme:** Adayın yüklediği PDF / görsel özgeçmiş dosyasını panelden ayrılmadan iframe içerisinde anında önizleyin veya tek tıkla `[Aday_Adi]_CV.pdf` formatında doğrudan indirin. Yüklenmeyen adaylar için otomatik yapılandırılmış dijital özgeçmiş kartı sunulur.
-  - **📨 Resmi KEP & E-İmza İş Teklifi Hazırlama:** 4857 Sayılı İş Kanunu ve 5070 Sayılı Elektronik İmza Kanunu standartlarına uygun resmi iş teklifi (maaş, başlama tarihi, deneme süresi ve yasal delil maddeleri) üretimi ve panoya kopyalama / yazdırma desteği.
+  - **📨 A4 Resmi İş Teklifi Belgesi & KEP Protokolü (HTML / PDF):** 4857 Sayılı İş Kanunu ve 5070 Sayılı Elektronik İmza Kanunu standartlarına uygun kurumsal antetli, net/brüt ücret, yan haklar, deneme süresi ve çift taraflı imza/kaşe bloklu resmi A4 formatında iş teklif belgesi (`/api/is-teklifi-html`).
+  - **🎙️ Mülakat Puanlama & Yetkinlik Değerlendirme Kartı (Interview Scorecard):** Adayların mülakat süreçlerini Teknik Yetkinlik (%35), İletişim (%25), Problem Çözme (%20) ve Kültür Uyumu (%20) kriterleriyle 100 üzerinden ağırlıklı puanlayan ve tavsiye notu üreten değerlendirme motoru (`/api/mulakat-degerlendir`).
+  - **📊 İşe Alım Pipeline Analitiği & Yıllık Faaliyet Raporu:** Başvuru hunisi (Değerlendiriliyor -> Ön Eleme -> Mülakat -> Teklif -> İşe Alındı dönüşüm oranları), pozisyon yoğunluğu ve KEP kullanım yüzdesini hesaplayan A4 formatında yazdırılabilir İK Faaliyet Raporu (`/api/ik-faaliyet-raporu-html`).
   - **6 Aşamalı İşe Alım Pipeline'ı:** *Değerlendiriliyor*, *Ön Eleme Geçti*, *Mülakata Çağrıldı*, *Teklif Yapıldı*, *İşe Alındı*, *Reddedildi*.
   - **Arama ve Filtreleme:** Aday ismi, TCKN, telefon, KEP adresi veya pozisyona göre anlık filtreleme.
   - **Canlı İstatistik Kartları:** Toplam, incelemedeki, mülakattaki ve teklif/kabul aşamasındaki aday metrikleri.
-  - **Excel / CSV Dışa Aktarımı:** UTF-8 BOM destekli, Türkçe karakter sorunu yaşatmayan tam kapsamlı aday veri dökümü (KEP ve onaylanan teklif bilgileri dahil).
+  - **Excel / CSV Dışa Aktarımı:** UTF-8 BOM destekli, Türkçe karakter sorunu yaşatmayan tam kapsamlı aday veri dökümü (mülakat skorları, KEP ve onaylanan teklif bilgileri dahil - `/api/export-csv`).
 - **Çift Motorlu & Çevrimdışı Dayanıklı Mimari:**
   - **Python Motoru:** Dahili SQLite veritabanı ile tek tıkla çalışır (`server.py`).
   - **PHP Motoru:** cPanel, Plesk ve paylaşımlı hostinglerde sıfır yapılandırmayla çalışır (`api.php`).
@@ -78,8 +80,14 @@ Tüm dosyaları FTP ile web sunucunuzun ana dizinine veya dilediğiniz bir alt k
 | `POST` | `/api/durum-guncelle` | Adayın sürecini günceller (`tracking_code`, `status`). |
 | `POST` | `/api/teklif-olustur` | Adaya 4857 & 5070 uyumlu resmi KEP teklifi hazırlar ve kaydeder. |
 | `GET` | `/api/teklif-goruntule?tracking_code=...` | Oluşturulan teklif metnini ve maaş detaylarını döndürür. |
+| `GET` | `/api/is-teklifi-html?tracking_code=...` | A4 formatında resmi antetli, yazdırılabilir iş teklif mektubunu üretir. |
+| `POST` | `/api/mulakat-degerlendir` | Aday mülakat yetkinlik puanlarını ve ağırlıklı skoru kaydeder. |
+| `GET` | `/api/ik-faaliyet-raporu-json` | İK yetenek kazanımı ve huni dönüşüm metriklerini döndürür. |
+| `GET` | `/api/ik-faaliyet-raporu-html` | Yazdırılabilir A4 formatında Yıllık İK Faaliyet ve Pipeline Raporu sunar. |
+| `GET` | `/api/export-csv` | Excel uyumlu UTF-8 BOM destekli aday listesini CSV formatında indirir. |
 | `GET` | `/api/validate-kep?kep=...` | KEP adresinin BTK format uygunluğunu test eder. |
 | `GET` | `/api/istatistikler` | Pozisyon ve durum bazlı özet başvuru sayılarını döndürür. |
+| `GET` | `/health` | Servis sağlık durum kontrolü. |
 
 ---
 
